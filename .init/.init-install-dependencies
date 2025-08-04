@@ -1,0 +1,4 @@
+{
+    "command": "npm install",
+    "working_directory": "/home/kavia/workspace/code-generation/restaurant-billing-and-invoicing-system-93616/restaurant_billing_frontend"
+}
