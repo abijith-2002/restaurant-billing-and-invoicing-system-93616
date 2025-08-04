@@ -3,7 +3,7 @@
 //
 export const COLORS = {
   primary: "#4CAF50",
-  accent: "#FF9800",
+  accent: "#2196F3", // Changed from #FF9800 (orange) to #2196F3 (blue)
   secondary: "#FFFFFF",
   text: "#222",
   sidebarBg: "#f5f5f5",
