@@ -1,1 +1,3 @@
-# restaurant-billing-and-invoicing-system-93616
+# Project Repository
+
+This is the initial README file for the project.
