@@ -1,14 +1,5 @@
-//
-// theme.js - Expose app-wide color palette and styling helpers
-//
-export const COLORS = {
-  primary: "#4CAF50",
-  accent: "#2196F3", // Changed from #FF9800 (orange) to #2196F3 (blue)
-  secondary: "#FFFFFF",
-  text: "#222",
-  sidebarBg: "#f5f5f5",
-  sidebarActive: "#e0f7ef",
-  border: "#E0E0E0"
-};
+// theme.js is deprecated. All theme variables now come from design-tokens.css as CSS variables.
+// This file remains only for backward compatibility.
 
-export const SHADOW = "0 2px 8px 0 rgba(0,0,0,0.05)";
+export const COLORS = {};
+export const SHADOW = "";

@@ -1,271 +1,208 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
+import React, { useState } from "react";
 import Sidebar from "./components/Sidebar";
-import MenuBrowser from "./components/MenuBrowser";
-import OrderEntry from "./components/OrderEntry";
-import OrderStatus from "./components/OrderStatus";
-import BillsScreen from "./components/BillsScreen";
-import { COLORS } from "./theme";
+import MenuGrid from "./components/MenuGrid";
+import OrderPanel from "./components/OrderPanel";
 
-// Sample Data
+/**
+ * Sample dishes matching Figma HTML content and layout.
+ */
 const sampleMenu = [
   {
-    id: "M1",
-    name: "Margherita Pizza",
-    price: 300,
-    description: "Classic cheese and tomato pizza.",
+    id: "dish1",
+    name: "Spicy seasoned seafood noodles",
+    price: 2.29,
+    currency: "$",
+    description: "",
     image:
       "https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&w=400&q=60",
+    available: 20,
   },
   {
-    id: "M2",
-    name: "Paneer Tikka",
-    price: 180,
-    description: "Spicy marinated paneer cubes grilled to perfection.",
+    id: "dish2",
+    name: "Salted Pasta with mushroom sauce",
+    price: 2.69,
+    currency: "$",
+    description: "",
     image:
       "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&w=400&q=60",
+    available: 11,
   },
   {
-    id: "M3",
-    name: "Veg Hakka Noodles",
-    price: 160,
-    description: "Stir-fried noodles with fresh vegetables.",
+    id: "dish3",
+    name: "Beef dumpling in hot and sour soup",
+    price: 2.99,
+    currency: "$",
+    description: "",
     image:
       "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&w=400&q=60",
+    available: 16,
   },
   {
-    id: "M4",
-    name: "Masala Dosa",
-    price: 90,
-    description: "Crispy dosa filled with spiced potato mash.",
+    id: "dish4",
+    name: "Hot spicy fried rice with omelet",
+    price: 3.49,
+    currency: "$",
+    description: "",
     image:
       "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&w=400&q=60",
+    available: 13,
   },
   {
-    id: "M5",
-    name: "Cold Coffee",
-    price: 70,
-    description: "Refreshing chilled coffee with a hint of chocolate.",
+    id: "dish5",
+    name: "Spicy instant noodle with special omelette",
+    price: 3.59,
+    currency: "$",
+    description: "",
     image:
       "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&w=400&q=60",
-  }
+    available: 17,
+  },
+  {
+    id: "dish6",
+    name: "Healthy noodle with spinach leaf",
+    price: 3.29,
+    currency: "$",
+    description: "",
+    image:
+      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&w=400&q=60",
+    available: 22,
+  },
+];
+
+// Menu categories from Figma tabs
+const menuCategories = [
+  "Hot Dishes",
+  "Cold Dishes",
+  "Soup",
+  "Grill",
+  "Appetizer",
+  "Dessert",
 ];
 
 const initialNav = [
-  { label: "New Order", icon: "🧾", key: "order" },
-  { label: "Menu", icon: "🍔", key: "menu" },
-  { label: "Orders", icon: "📦", key: "orders" },
-  { label: "Bills", icon: "💳", key: "bills" }
+  { label: "Home", icon: "🏠", key: "home" },
+  { label: "Discounts", icon: "🏷️", key: "discounts" },
+  { label: "Dashboard", icon: "📊", key: "dashboard" },
+  { label: "Messages", icon: "💬", key: "messages" },
+  { label: "Notifications", icon: "🔔", key: "notifications" },
+  { label: "Settings", icon: "⚙️", key: "settings" },
 ];
 
-// PUBLIC_INTERFACE
 function App() {
-  // Theme state & effect for light-theme
-  const [theme] = useState("light");
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
-
-  // Navigation handling
-  const [nav, setNav] = useState("order");
-
-  // Cart/order entry state
+  // Sidebar nav index (for Figma sidebar vertical nav)
+  const [activeSidebar, setActiveSidebar] = useState("home");
+  // Menu tab/category
+  const [category, setCategory] = useState(menuCategories[0]);
+  // Cart state: { id, name, price, qty, image }
   const [cart, setCart] = useState([]);
-  // Orders [{id,table,items,status,ts}]
-  const [orders, setOrders] = useState([]);
-  // Bills [{id,table,items,total,ts}]
-  const [bills, setBills] = useState([]);
+  // Tab in cart area ("Dine In", "To Go", ...)
+  const [orderType, setOrderType] = useState("Dine In");
+  // Basic search
+  const [search, setSearch] = useState("");
 
-  // Add item to cart
-  const addToCart = (menuItem) => {
+  // (Figma: add to cart on menu grid)
+  const handleAddDish = (dish) => {
     setCart((prev) => {
-      let found = prev.find((it) => it.id === menuItem.id);
+      const found = prev.find((it) => it.id === dish.id);
       if (found)
         return prev.map((it) =>
-          it.id === menuItem.id ? { ...it, qty: it.qty + 1 } : it
+          it.id === dish.id ? { ...it, qty: it.qty + 1 } : it
         );
-      return [...prev, { ...menuItem, qty: 1 }];
+      return [...prev, { ...dish, qty: 1 }];
     });
   };
 
-  // Submit order event
-  const handleOrderSubmit = ({ table, items }) => {
-    const oid =
-      "ORD-" +
-      (orders.length + 1).toString().padStart(2, "0") +
-      "-" +
-      Math.floor(Math.random() * 900 + 100);
-    setOrders((prev) => [
-      ...prev,
-      {
-        id: oid,
-        table,
-        items,
-        status: "pending",
-        ts: Date.now(),
-      },
-    ]);
-    window.alert("Order submitted!");
-    setNav("orders");
-  };
-
-  // Update order status
-  const handleOrderUpdate = (order, newStatus) => {
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === order.id ? { ...o, status: newStatus } : o
-      )
+  // (Figma: quantity increment/decrement in cart)
+  const handleQty = (dishId, delta) => {
+    setCart((prev) =>
+      prev
+        .map((it) =>
+          it.id === dishId ? { ...it, qty: Math.max(1, it.qty + delta) } : it
+        )
+        .filter((it) => it.qty > 0)
     );
-    // If served, move to bills
-    if (newStatus === "done") {
-      const total = order.items.reduce(
-        (sum, it) => sum + it.price * it.qty,
-        0
-      );
-      setBills((bills) => [
-        ...bills,
-        {
-          id: order.id,
-          table: order.table,
-          ts: order.ts,
-          items: order.items,
-          total,
-        },
-      ]);
-    }
   };
 
-  // Responsive sidebar
-  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-  const toggleSidebar = () => setShowMobileSidebar((v) => !v);
+  // Remove (Figma: trash) in cart
+  const handleRemoveFromCart = (dishId) => {
+    setCart((prev) => prev.filter((it) => it.id !== dishId));
+  };
+
+  // Cart notes: maintain notes per item id
+  const [cartNotes, setCartNotes] = useState({});
+  const handleNoteChange = (dishId, val) =>
+    setCartNotes((n) => ({ ...n, [dishId]: val }));
 
   return (
-    <div style={styles.appShell}>
-      {/* Responsive/mobile sidebar toggle */}
-      <div style={{ display: "none" }} id="sidebar-toggle-btn"></div>
-      <div style={styles.layout}>
-        <div
-          style={{
-            ...styles.sidebarBox,
-            ...(showMobileSidebar
-              ? { left: 0, position: "fixed" }
-              : {}),
-          }}
-        >
-          <Sidebar
-            navItems={initialNav}
-            active={nav}
-            onNavigate={setNav}
-          />
-        </div>
-        <main style={styles.main}>
-          <header style={styles.header}>
-            <button
-              style={styles.menuBtn}
-              onClick={toggleSidebar}
-              aria-label={"Show navigation"}
-            >
-              ☰
-            </button>
-            <span style={styles.headerTitle}>
-              {initialNav.find((n) => n.key === nav)?.label}
-            </span>
+    <div style={{ display: "flex", height: "100vh", background: "var(--color-bg)" }}>
+      {/* Sidebar */}
+      <Sidebar
+        navItems={initialNav}
+        active={activeSidebar}
+        onNavigate={setActiveSidebar}
+      />
+
+      {/* Main Figma-style content */}
+      <main style={{ flex: 1, minWidth: 0, padding: "40px 0 0 140px", display: "flex" }}>
+        {/* Section: menu/food grid */}
+        <section style={{ flex: 2, minWidth: 450, maxWidth: 750, paddingRight: 36 }}>
+          {/* Figma Topbar/Header */}
+          <header className="topbar">
+            <div>
+              <div className="restaurant-title">Jaegar Resto</div>
+              <div className="date-caption">Tuesday, 2 Feb 2021</div>
+            </div>
+            <div style={{ marginLeft: "auto" }}>
+              <div className="menu-searchbox">
+                <span style={{ color: "var(--color-placeholder)", display: "flex" }}>
+                  <svg width="20" height="20" style={{ marginRight: 3 }} fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="9" cy="9" r="7"/><path d="M14 14L19 19"/>
+                  </svg>
+                </span>
+                <input
+                  type="search"
+                  placeholder="Search for food, coffee, etc.."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  style={{ background: "none", border: "none", color: "var(--color-light)", font: "var(--font-body)", flex: 1, outline: "none", marginLeft: 8 }}
+                />
+              </div>
+            </div>
           </header>
-          <section style={styles.section}>
-            {nav === "order" && (
-              <>
-                <OrderEntry
-                  cart={cart}
-                  setCart={setCart}
-                  onSubmit={handleOrderSubmit}
-                />
-                <MenuBrowser
-                  menu={sampleMenu}
-                  onAdd={addToCart}
-                />
-              </>
+          {/* Tabs (dishes categories) */}
+          <nav style={{ margin: "32px 0 12px 0" }}>
+            {menuCategories.map((cat) => (
+              <button
+                key={cat}
+                className={`tab-category${category === cat ? " active" : ""}`}
+                onClick={() => setCategory(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </nav>
+          {/* Menu Grid */}
+          <MenuGrid
+            menu={sampleMenu.filter((dish) =>
+              dish.name.toLowerCase().includes(search.toLowerCase()) &&
+              (category === "Hot Dishes" ? true : true) /* For demo: categories don't filter (could add) */
             )}
-            {nav === "menu" && (
-              <MenuBrowser menu={sampleMenu} onAdd={addToCart} />
-            )}
-            {nav === "orders" && (
-              <OrderStatus orders={orders} onUpdate={handleOrderUpdate} />
-            )}
-            {nav === "bills" && (
-              <BillsScreen bills={bills} />
-            )}
-          </section>
-        </main>
-      </div>
+            onAdd={handleAddDish}
+          />
+        </section>
+        {/* Right: Order/Cart Panel */}
+        <OrderPanel
+          cart={cart}
+          onQty={handleQty}
+          onRemove={handleRemoveFromCart}
+          orderType={orderType}
+          setOrderType={setOrderType}
+          notes={cartNotes}
+          onNoteChange={handleNoteChange}
+        />
+      </main>
     </div>
   );
 }
-
-const styles = {
-  appShell: {
-    background: COLORS.secondary,
-    minHeight: "100vh",
-    fontFamily:
-      "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Helvetica Neue,sans-serif",
-  },
-  layout: {
-    display: "flex",
-    minHeight: "100vh",
-    alignItems: "stretch",
-    flexDirection: "row",
-  },
-  sidebarBox: {
-    minWidth: 210,
-    width: 240,
-    zIndex: 101,
-    background: COLORS.sidebarBg,
-  },
-  main: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    minHeight: "100vh",
-    maxWidth: "100vw",
-    position: "relative",
-  },
-  header: {
-    height: 58,
-    display: "flex",
-    alignItems: "center",
-    borderBottom: `1px solid ${COLORS.border}`,
-    padding: "0 28px",
-    background: "#fff",
-    fontWeight: 600,
-    letterSpacing: ".01em",
-    boxShadow: "0 3px 9px #eeeeee33",
-  },
-  headerTitle: { fontSize: "1.3em", color: COLORS.primary },
-  menuBtn: {
-    display: "none",
-    background: "none",
-    border: "none",
-    fontSize: "1.8em",
-    marginRight: "15px",
-    cursor: "pointer",
-    color: COLORS.accent,
-  },
-  section: {
-    padding: "38px 35px",
-    flex: 1,
-    width: "100%",
-    maxWidth: "980px",
-    margin: "0 auto",
-    boxSizing: "border-box",
-  },
-};
-
-// Responsive CSS-in-JS override (for tablets)
-window.addEventListener("resize", () => {
-  try {
-    const btn = document.getElementById("sidebar-toggle-btn");
-    if (window.innerWidth < 768 && btn) btn.style.display = "block";
-    else if (btn) btn.style.display = "none";
-  } catch {}
-});
 
 export default App;
