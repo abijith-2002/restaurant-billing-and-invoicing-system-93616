@@ -1,104 +1,104 @@
-/* CSS Variables for Theme Management */
 :root {
-  /* Light theme colors */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --text-primary: #282c34;
-  --text-secondary: #61dafb;
-  --border-color: #e9ecef;
-  --button-bg: #007bff;
-  --button-text: #ffffff;
+  --primary: #4CAF50;
+  --accent: #FF9800;
+  --secondary: #FFFFFF;
+  --sidebar-bg: #f5f5f5;
+  --sidebar-active: #e0f7ef;
+  --border: #E0E0E0;
+  --text-main: #222;
+  --shadow: 0 2px 8px 0 rgba(0,0,0,0.07);
 }
 
-[data-theme="dark"] {
-  /* Dark theme colors */
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #282c34;
-  --text-primary: #ffffff;
-  --text-secondary: #61dafb;
-  --border-color: #404040;
-  --button-bg: #0056b3;
-  --button-text: #ffffff;
+/* Reset */
+html,body {
+  background: var(--secondary);
+  padding: 0;
+  margin: 0;
+  font-size: 17px;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Fira Sans', 'Helvetica Neue', sans-serif;
+  color: var(--text-main);
 }
 
-.App {
-  text-align: center;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+section, main {
+  background: var(--secondary);
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+}
+
+::-webkit-scrollbar-thumb { background: #eee; }
+::-webkit-scrollbar-track { background: #faFAfA; }
+
+table {
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fff;
+}
+th,
+td {
+  padding: 9px 9px 7px 7px;
+  border-bottom: 1px solid #f3f3f3;
+}
+th {
+  background: #f0f6f6;
+  font-weight: 700;
+}
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Sidebar customization (component) */
+aside {
   min-height: 100vh;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: left 0.3s;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+/* Responsive layout */
+@media (max-width: 1000px) {
+  section {
+    padding: 26px 10px !important;
+    max-width: 100vw !important;
   }
 }
 
-.App-header {
-  background-color: var(--bg-secondary);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: var(--text-primary);
-  transition: background-color 0.3s ease;
-  position: relative;
-}
-
-.App-link {
-  color: var(--text-secondary);
-  transition: color 0.3s ease;
-}
-
-.theme-toggle {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background-color: var(--button-bg);
-  color: var(--button-text);
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.theme-toggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  opacity: 0.9;
-}
-
-.theme-toggle:active {
-  transform: translateY(0);
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Responsive design for mobile */
 @media (max-width: 768px) {
-  .theme-toggle {
-    top: 10px;
-    right: 10px;
-    padding: 8px 16px;
-    font-size: 12px;
+  aside { min-width: 64px !important; width: 64px !important; }
+  aside nav button { font-size: 1em !important; padding:10px 6px !important;}
+  aside .title { font-size: 1em !important; }
+  section { padding: 13px 2vw !important; }
+  .App {
+    min-width: 100vw;
+    overflow-x: clip;
   }
 }
+
+/* Utility */
+input[type="text"],
+input[type="number"],
+input[type="search"] {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 13px;
+  font-size: 1.02em;
+  transition: border 0.15s;
+}
+input:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+a { color: var(--primary); text-decoration: none;}
+a:hover { text-decoration: underline; }
+
+/* Remove number spinner for input[type=number] on Chrome */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] { -moz-appearance:textfield; }
